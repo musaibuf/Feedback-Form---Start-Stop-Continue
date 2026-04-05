@@ -89,8 +89,12 @@ function App() {
     };
 
     try {
-      // Send data to our own server.js backend
-      await axios.post('/api/submit', payload);
+      // Use Environment Variable for the Backend URL
+      // If using Vite, change REACT_APP_BACKEND_URL to VITE_BACKEND_URL
+      const backendUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000';
+      
+      await axios.post(`${backendUrl}/api/submit`, payload);
+      
       setStep('submitted');
     } catch (error) {
       console.error("Failed to save results:", error);
@@ -99,7 +103,7 @@ function App() {
       setIsSubmitting(false);
     }
   };
-  
+
   const calculateProgress = () => {
     let filled = 0;
     if (responses.start.trim()) filled += 1;

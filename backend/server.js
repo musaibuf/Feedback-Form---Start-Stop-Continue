@@ -1,18 +1,15 @@
 const express = require('express');
 const cors = require('cors');
 const { google } = require('googleapis');
-const path = require('path');
 require('dotenv').config();
 
 const app = express();
+
+// Allow requests from your frontend
 app.use(cors());
 app.use(express.json());
 
-// 1. Serve the React frontend static files
-// NOTE: If you are using Vite, change 'build' to 'dist' below
-app.use(express.static(path.join(__dirname, 'build')));
-
-// 2. Set up Google Sheets Authentication
+// Set up Google Sheets Authentication
 const credentials = JSON.parse(process.env.GOOGLE_CREDENTIALS);
 
 const auth = new google.auth.GoogleAuth({
@@ -25,7 +22,7 @@ const auth = new google.auth.GoogleAuth({
 
 const sheets = google.sheets({ version: 'v4', auth });
 
-// 3. API Endpoint to receive data from React
+// API Endpoint to receive data
 app.post('/api/submit', async (req, res) => {
   try {
     const { name, department, start, stop, continue: continueHabit, timestamp } = req.body;
@@ -46,10 +43,9 @@ app.post('/api/submit', async (req, res) => {
   }
 });
 
-// 4. Catch-all route to hand page refreshes back to React
-app.get('*', (req, res) => {
-  // NOTE: If you are using Vite, change 'build' to 'dist' below
-  res.sendFile(path.join(__dirname, 'build', 'index.html'));
+// Simple health check route
+app.get('/', (req, res) => {
+  res.send('Backend is running!');
 });
 
 const PORT = process.env.PORT || 5000;
