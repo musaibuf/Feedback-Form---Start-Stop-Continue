@@ -48,7 +48,13 @@ const containerStyles = {
 
 function App() {
   const [step, setStep] = useState('welcome');
-  const [userInfo, setUserInfo] = useState({ name: '', department: '' });
+  const [userInfo, setUserInfo] = useState({ 
+    name: '', 
+    organization: '',
+    department: '', 
+    jobTitle: '',
+    experience: ''
+  });
   const [responses, setResponses] = useState({ start: '', stop: '', continue: '' });
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -58,11 +64,17 @@ function App() {
   }, [step]);
 
   const handleStart = () => {
-    if (userInfo.name.trim() && userInfo.department.trim()) {
+    if (
+      userInfo.name.trim() && 
+      userInfo.organization.trim() && 
+      userInfo.department.trim() && 
+      userInfo.jobTitle.trim() && 
+      userInfo.experience.trim()
+    ) {
       setError('');
       setStep('assessment');
     } else {
-      setError('Please fill out both your name and department.');
+      setError('Please fill out all fields to continue.');
     }
   };
 
@@ -81,7 +93,10 @@ function App() {
 
     const payload = {
       name: userInfo.name,
+      organization: userInfo.organization,
       department: userInfo.department,
+      jobTitle: userInfo.jobTitle,
+      experience: userInfo.experience,
       start: responses.start,
       stop: responses.stop,
       continue: responses.continue,
@@ -89,12 +104,8 @@ function App() {
     };
 
     try {
-      // Use Environment Variable for the Backend URL
-      // If using Vite, change REACT_APP_BACKEND_URL to VITE_BACKEND_URL
       const backendUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000';
-      
       await axios.post(`${backendUrl}/api/submit`, payload);
-      
       setStep('submitted');
     } catch (error) {
       console.error("Failed to save results:", error);
@@ -119,13 +130,18 @@ function App() {
         <Typography variant="h1">Post-Training Reflection</Typography>
       </Box>
       <Typography variant="h5" align="center" color="text.secondary" sx={{ mb: 4, fontWeight: 'normal', px: { xs: 1, sm: 2 }, borderBottom: 'none' }}>
-        Reflect on your recent training session. Identify one habit to start, one to stop, and one to continue.
+        Reflect on your training session. Identify one habit to start, one to stop, and one to continue.
       </Typography>
       <Box sx={{ maxWidth: { xs: '100%', sm: 400 }, margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 2, px: { xs: 1, sm: 0 } }}>
         <TextField fullWidth label="Your Name" variant="outlined" value={userInfo.name} onChange={(e) => setUserInfo({ ...userInfo, name: e.target.value })} />
+        <TextField fullWidth label="Your Organization" variant="outlined" value={userInfo.organization} onChange={(e) => setUserInfo({ ...userInfo, organization: e.target.value })} />
         <TextField fullWidth label="Your Department" variant="outlined" value={userInfo.department} onChange={(e) => setUserInfo({ ...userInfo, department: e.target.value })} />
+        <TextField fullWidth label="Your Job Title" variant="outlined" value={userInfo.jobTitle} onChange={(e) => setUserInfo({ ...userInfo, jobTitle: e.target.value })} />
+        <TextField fullWidth label="Years of Experience" variant="outlined" type="number" value={userInfo.experience} onChange={(e) => setUserInfo({ ...userInfo, experience: e.target.value })} />
+        
         {error && <Alert severity="error">{error}</Alert>}
-        <Button variant="contained" size="large" color="primary" onClick={handleStart} disabled={!userInfo.name || !userInfo.department} startIcon={<RocketLaunchIcon />} sx={{ mt: 2, py: 1.5, width: { xs: '100%', sm: 'auto' }, alignSelf: 'center' }}>
+        
+        <Button variant="contained" size="large" color="primary" onClick={handleStart} startIcon={<RocketLaunchIcon />} sx={{ mt: 2, py: 1.5, width: { xs: '100%', sm: 'auto' }, alignSelf: 'center' }}>
           Begin Questionnaire
         </Button>
       </Box>
